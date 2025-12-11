@@ -7,6 +7,25 @@ defined('MOODLE_INTERNAL') || die();
 class export_service {
 
     /**
+     * Clean HTML content
+     * - removes OnlyOffice docData class attributes.
+     *
+     * @param string $content HTML content to clean
+     * @return string Cleaned HTML content
+     */
+    private function clean_html_content($content) {
+        if (empty($content)) {
+            return $content;
+        }
+
+        // Remove class attributes that start with "docData;" (OnlyOffice formatting data)
+        // This regex matches class="docData;..." with any content until the closing quote
+        $content = preg_replace('/\s*class\s*=\s*"docData;[^"]*"/i', '', $content);
+
+        return $content;
+    }
+
+    /**
      * Export course structure and content
      */
     public function export_course($course) {
@@ -51,7 +70,7 @@ class export_service {
             $sections[] = [
                 'id' => (int)$section->id,
                 'name' => $section->name ?: "Section {$section->section}",
-                'summary' => $section->summary ?: '',
+                'summary' => $this->clean_html_content($section->summary ?: ''),
                 'section_number' => (int)$section->section,
                 'section_url' => $this->generate_section_url($courseid, $section->section),
                 'activities' => $activities
@@ -100,7 +119,7 @@ class export_service {
                 'id' => (int)$courseModule->id,
                 'name' => $activity->name,
                 'type' => $module->name,
-                'description' => isset($activity->intro) ? $activity->intro : '',
+                'description' => $this->clean_html_content(isset($activity->intro) ? $activity->intro : ''),
                 'activity_url' => $this->generate_activity_url($courseModule->id, $module->name),
                 'files' => $this->get_activity_files($courseModule, $module->name),
                 'urls' => $this->get_activity_urls($courseModule, $module->name, $activity),
@@ -351,7 +370,7 @@ class export_service {
                     'slot' => (int)$slot->slot,
                     'question_id' => (int)$question->id,
                     'name' => $question->name,
-                    'question_text' => $question->questiontext,
+                    'question_text' => $this->clean_html_content($question->questiontext),
                     'question_type' => $question->qtype,
                     'default_mark' => (float)$question->defaultmark,
                     'max_mark' => (float)$slot->maxmark
@@ -492,7 +511,7 @@ class export_service {
             $bookData['chapters'][] = [
                 'id' => (int)$chapter->id,
                 'title' => $chapter->title,
-                'content' => $chapter->content,
+                'content' => $this->clean_html_content($chapter->content),
                 'pagenum' => (int)$chapter->pagenum,
                 'subchapter' => (bool)$chapter->subchapter,
                 'hidden' => (bool)$chapter->hidden
@@ -522,7 +541,7 @@ class export_service {
             $glossaryData['entries'][] = [
                 'id' => (int)$entry->id,
                 'concept' => $entry->concept,
-                'definition' => $entry->definition,
+                'definition' => $this->clean_html_content($entry->definition),
                 'author' => $entry->userid,
                 'timecreated' => $entry->timecreated,
                 'timemodified' => $entry->timemodified
@@ -538,7 +557,7 @@ class export_service {
     private function get_page_content($activity) {
         return [
             'type' => 'page',
-            'content' => $activity->content ?? ''
+            'content' => $this->clean_html_content($activity->content ?? '')
         ];
     }
 
