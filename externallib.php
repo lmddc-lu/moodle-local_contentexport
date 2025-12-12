@@ -266,7 +266,7 @@ class local_contentexport_external extends external_api {
 
         // Get total count for pagination metadata
         $countSql = "SELECT COUNT(DISTINCT c.id) " . substr($sql, strpos($sql, 'FROM'));
-        $totalCourses = $DB->count_records_sql($countSql, $sqlparams);
+        $totalCourses = (int)$DB->count_records_sql($countSql, $sqlparams);
 
         // Add ordering and pagination
         if (!$params['include_non_enrolled']) {
@@ -305,18 +305,23 @@ class local_contentexport_external extends external_api {
 
         // Calculate pagination metadata
         $hasMore = ($params['offset'] + count($coursesData)) < $totalCourses;
-        $nextOffset = $hasMore ? ($params['offset'] + $params['limit']) : null;
+
+        $pagination = [
+            'total_courses' => (int)$totalCourses,
+            'returned_courses' => (int)count($coursesData),
+            'offset' => (int)$params['offset'],
+            'limit' => (int)$params['limit'],
+            'has_more' => (bool)$hasMore
+        ];
+
+        // Only include next_offset if there are more results
+        if ($hasMore) {
+            $pagination['next_offset'] = (int)($params['offset'] + $params['limit']);
+        }
 
         return [
             'courses' => $coursesData,
-            'pagination' => [
-                'total_courses' => $totalCourses,
-                'returned_courses' => count($coursesData),
-                'offset' => $params['offset'],
-                'limit' => $params['limit'],
-                'has_more' => $hasMore,
-                'next_offset' => $nextOffset
-            ],
+            'pagination' => $pagination,
             'exported_at' => date('c')
         ];
     }

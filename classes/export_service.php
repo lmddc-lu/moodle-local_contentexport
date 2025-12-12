@@ -278,14 +278,22 @@ class export_service {
             $content .= $activity->description . ' ';
         }
 
+        // Decode HTML entities first to handle &lt; &gt; etc.
+        $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
         // Extract URLs using regex
-        $urlPattern = '/https?:\/\/[^\s<>"\']+/i';
+        $urlPattern = '/https?:\/\/[a-zA-Z0-9\-._~:\/?#\[\]@!$&\'()*+,;=%]+/i';
         preg_match_all($urlPattern, $content, $matches);
 
         foreach ($matches[0] as $url) {
             // Clean up the URL (remove trailing punctuation)
-            $cleanUrl = rtrim($url, '.,;:!?');
-            
+            $cleanUrl = rtrim($url, '.,;:!?)\'">');
+
+            // Validate the URL is actually valid
+            if (filter_var($cleanUrl, FILTER_VALIDATE_URL) === false) {
+                continue;
+            }
+
             $urls[] = [
                 'url' => $cleanUrl,
                 'display_type' => null,
