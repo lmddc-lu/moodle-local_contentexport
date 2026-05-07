@@ -51,7 +51,7 @@ class local_contentexport_external extends external_api {
                 'fullname' => new external_value(PARAM_TEXT, 'Course full name'),
                 'shortname' => new external_value(PARAM_TEXT, 'Course short name'),
                 'description' => new external_value(PARAM_RAW, 'Course description'),
-                'category' => new external_value(PARAM_TEXT, 'Course category name'),
+                'category' => new external_value(PARAM_RAW, 'Course category name'),
                 'course_url' => new external_value(PARAM_URL, 'Direct link to course in Moodle'),
                 'sections' => new external_multiple_structure(
                     new external_single_structure([
@@ -85,10 +85,10 @@ class local_contentexport_external extends external_api {
                                 ),
                                 'urls' => new external_multiple_structure(
                                     new external_single_structure([
-                                        'url' => new external_value(PARAM_URL, 'The URL'),
+                                        'url' => new external_value(PARAM_RAW, 'The URL'),
                                         'display_type' => new external_value(PARAM_INT, 'Display type for URL activities', VALUE_OPTIONAL),
-                                        'display_options' => new external_value(PARAM_TEXT, 'Display options', VALUE_OPTIONAL),
-                                        'parameters' => new external_value(PARAM_TEXT, 'URL parameters', VALUE_OPTIONAL),
+                                        'display_options' => new external_value(PARAM_RAW, 'Display options', VALUE_OPTIONAL),
+                                        'parameters' => new external_value(PARAM_RAW, 'URL parameters', VALUE_OPTIONAL),
                                         'is_primary_url' => new external_value(PARAM_BOOL, 'Is this the primary URL for the activity'),
                                         'found_in' => new external_value(PARAM_TEXT, 'Where this URL was found')
                                     ]), 'URLs associated with this activity'
@@ -336,7 +336,7 @@ class local_contentexport_external extends external_api {
                     'fullname' => new external_value(PARAM_TEXT, 'Course full name'),
                     'shortname' => new external_value(PARAM_TEXT, 'Course short name'),
                     'description' => new external_value(PARAM_RAW, 'Course description'),
-                    'category' => new external_value(PARAM_TEXT, 'Course category name'),
+                    'category' => new external_value(PARAM_RAW, 'Course category name'),
                     'course_url' => new external_value(PARAM_URL, 'Direct link to course in Moodle'),
                     'sections' => new external_multiple_structure(
                         new external_single_structure([
@@ -371,10 +371,10 @@ class local_contentexport_external extends external_api {
                                     ),
                                     'urls' => new external_multiple_structure(
                                         new external_single_structure([
-                                            'url' => new external_value(PARAM_URL, 'The URL'),
+                                            'url' => new external_value(PARAM_RAW, 'The URL'),
                                             'display_type' => new external_value(PARAM_INT, 'Display type for URL activities', VALUE_OPTIONAL),
-                                            'display_options' => new external_value(PARAM_TEXT, 'Display options', VALUE_OPTIONAL),
-                                            'parameters' => new external_value(PARAM_TEXT, 'URL parameters', VALUE_OPTIONAL),
+                                            'display_options' => new external_value(PARAM_RAW, 'Display options', VALUE_OPTIONAL),
+                                            'parameters' => new external_value(PARAM_RAW, 'URL parameters', VALUE_OPTIONAL),
                                             'is_primary_url' => new external_value(PARAM_BOOL, 'Is this the primary URL for the activity'),
                                             'found_in' => new external_value(PARAM_TEXT, 'Where this URL was found')
                                         ]), 'URLs associated with this activity'
