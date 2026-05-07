@@ -81,7 +81,6 @@ class local_contentexport_external extends external_api {
                                         'scorm_type' => new external_value(PARAM_TEXT, 'SCORM type (for SCORM files)', VALUE_OPTIONAL),
                                         'scorm_version' => new external_value(PARAM_TEXT, 'SCORM version (for SCORM files)', VALUE_OPTIONAL),
                                         'scorm_reference' => new external_value(PARAM_TEXT, 'SCORM reference (for SCORM files)', VALUE_OPTIONAL),
-                                        'is_scorm_package' => new external_value(PARAM_BOOL, 'Is this a SCORM package', VALUE_OPTIONAL)
                                     ]), 'Files associated with this activity'
                                 ),
                                 'urls' => new external_multiple_structure(

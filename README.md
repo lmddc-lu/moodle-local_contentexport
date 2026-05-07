@@ -211,12 +211,13 @@ The plugin extracts content and files from various Moodle activity types:
 - **Resource**: Files and documents
 - **Folder**: File collections
 - **Book**: Chapters and content
-- **Page**: HTML content
+- **Page**: HTML content plus files from the `mod_page/content` filearea (including images and H5P content embedded via the editor) and intro attachments
 - **URL**: External links
 - **Glossary**: Terms and definitions
 - **Assignment**: Instructions and files
 - **SCORM**: Packages and metadata
 - **Quiz**: Questions, attempts,...
+- **H5P Activity** (`h5pactivity`): Deployed `.h5p` package file from the `mod_h5pactivity/package` filearea plus intro attachments
 
 ## Security Notes
 - URLs are not public and require authentication

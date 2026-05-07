@@ -215,6 +215,12 @@ class export_service {
             case 'quiz':
                 $files = $this->get_quiz_files($courseModule);
                 break;
+            case 'page':
+                $files = $this->get_page_files($courseModule);
+                break;
+            case 'h5pactivity':
+                $files = $this->get_h5pactivity_files($courseModule);
+                break;
         }
 
         return $files;
@@ -621,6 +627,31 @@ class export_service {
     }
 
     /**
+     * Get files from page module (content + intro fileareas).
+     * The content filearea also holds files embedded via the editor,
+     * including H5P content embedded into the page body.
+     */
+    private function get_page_files($courseModule) {
+        $context = \context_module::instance($courseModule->id);
+        $contentFiles = $this->extract_files_from_context($context, 'mod_page', 'content');
+        $introFiles = $this->extract_files_from_context($context, 'mod_page', 'intro');
+
+        return array_merge($contentFiles, $introFiles);
+    }
+
+    /**
+     * Get files from h5pactivity module.
+     * The 'package' filearea contains the deployed .h5p package file.
+     */
+    private function get_h5pactivity_files($courseModule) {
+        $context = \context_module::instance($courseModule->id);
+        $packageFiles = $this->extract_files_from_context($context, 'mod_h5pactivity', 'package');
+        $introFiles = $this->extract_files_from_context($context, 'mod_h5pactivity', 'intro');
+
+        return array_merge($packageFiles, $introFiles);
+    }
+
+    /**
      * Get files from SCORM module
      */
     private function get_scorm_files($courseModule) {
@@ -636,10 +667,9 @@ class export_service {
                 $file['scorm_type'] = $scorm->scormtype ?? 'local';
                 $file['scorm_version'] = $scorm->version ?? 'unknown';
                 $file['scorm_reference'] = $scorm->reference ?? '';
-                $file['is_scorm_package'] = true;
             }
         }
-        
+
         return $files;
     }
 
