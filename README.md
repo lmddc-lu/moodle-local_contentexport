@@ -78,6 +78,7 @@ curl -X POST "https://your-site.com/webservice/rest/server.php" \
 - `offset` (int, optional): Starting position for pagination (default: 0)
 - `limit` (int, optional): Maximum courses per page, 0 = no limit (default: 50)
 - `include_non_enrolled` (bool, optional): Include non-enrolled courses (default: false, requires special permissions)
+- `include_site` (bool, optional): Include the site home course / front page so its content (e.g. a site-wide glossary) is enumerable (default: false)
 
 **Examples**:
 
@@ -105,6 +106,13 @@ curl -X POST "https://your-site.com/webservice/rest/server.php" \
   -d "moodlewsrestformat=json" \
   -d "include_hidden=1" \
   -d "include_non_enrolled=1"
+
+# Include the site home course (front page) alongside enrolled courses
+curl -X POST "https://your-site.com/webservice/rest/server.php" \
+  -d "wstoken=YOUR_TOKEN" \
+  -d "wsfunction=local_contentexport_export_all_courses" \
+  -d "moodlewsrestformat=json" \
+  -d "include_site=1"
 ```
 
 ## Response Format

@@ -202,14 +202,15 @@ class local_contentexport_external extends external_api {
             'category_id' => new external_value(PARAM_INT, 'Limit to specific category (0 = all)', VALUE_DEFAULT, 0),
             'offset' => new external_value(PARAM_INT, 'Starting position for pagination (0-based)', VALUE_DEFAULT, 0),
             'limit' => new external_value(PARAM_INT, 'Maximum number of courses to return (0 = no limit)', VALUE_DEFAULT, 50),
-            'include_non_enrolled' => new external_value(PARAM_BOOL, 'Include courses user is not enrolled in (requires special permissions)', VALUE_DEFAULT, false)
+            'include_non_enrolled' => new external_value(PARAM_BOOL, 'Include courses user is not enrolled in (requires special permissions)', VALUE_DEFAULT, false),
+            'include_site' => new external_value(PARAM_BOOL, 'Include the site home course (front page) so its content is enumerable', VALUE_DEFAULT, false)
         ]);
     }
 
     /**
      * Export all accessible courses with pagination
      */
-    public static function export_all_courses($include_hidden = false, $category_id = 0, $offset = 0, $limit = 50, $include_non_enrolled = false) {
+    public static function export_all_courses($include_hidden = false, $category_id = 0, $offset = 0, $limit = 50, $include_non_enrolled = false, $include_site = false) {
         global $DB, $USER;
 
         // Validate parameters
@@ -218,7 +219,8 @@ class local_contentexport_external extends external_api {
             'category_id' => $category_id,
             'offset' => $offset,
             'limit' => $limit,
-            'include_non_enrolled' => $include_non_enrolled
+            'include_non_enrolled' => $include_non_enrolled,
+            'include_site' => $include_site
         ]);
 
         // Check permissions for non-enrolled courses
@@ -234,9 +236,28 @@ class local_contentexport_external extends external_api {
             // Get all courses (enrolled and non-enrolled)
             $sql = "SELECT DISTINCT c.id, c.fullname, c.shortname, c.summary, c.category, c.visible
                     FROM {course} c
-                    WHERE c.id != :siteid";
-            
-            $sqlparams = ['siteid' => SITEID];
+                    WHERE 1 = 1";
+            $sqlparams = [];
+
+            if (!$params['include_site']) {
+                $sql .= " AND c.id != :siteid";
+                $sqlparams['siteid'] = SITEID;
+            }
+        } else if ($params['include_site']) {
+            // Enrolled courses plus the site home course. The site course is
+            // admitted via a LEFT JOIN so it appears even though no one is
+            // enrolled in it - front-page visibility is governed by site access
+            // and capability, not enrolment.
+            $sql = "SELECT c.id, c.fullname, c.shortname, c.summary, c.category, c.visible
+                    FROM {course} c
+                    LEFT JOIN {enrol} e ON e.courseid = c.id
+                    LEFT JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.userid = :userid
+                    WHERE (ue.id IS NOT NULL OR c.id = :siteid)";
+
+            $sqlparams = [
+                'userid' => $USER->id,
+                'siteid' => SITEID
+            ];
         } else {
             // Get only enrolled courses (original behavior)
             $sql = "SELECT c.id, c.fullname, c.shortname, c.summary, c.category, c.visible
@@ -245,7 +266,7 @@ class local_contentexport_external extends external_api {
                     JOIN {user_enrolments} ue ON ue.enrolid = e.id
                     WHERE ue.userid = :userid
                     AND c.id != :siteid";
-            
+
             $sqlparams = [
                 'userid' => $USER->id,
                 'siteid' => SITEID
