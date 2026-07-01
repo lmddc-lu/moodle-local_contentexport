@@ -320,7 +320,10 @@ class export_service {
      * Get content-specific data for activities (books, glossaries, etc.)
      */
     private function get_activity_content($courseModule, $moduleName, $activity) {
-        $contentData = [];
+        // Default to a typed object so content_data is always a JSON object.
+        // An empty PHP array would serialise as [] and make the field's JSON
+        // type inconsistent (array when empty, object when populated).
+        $contentData = ['type' => 'none'];
 
         switch ($moduleName) {
             case 'book':
